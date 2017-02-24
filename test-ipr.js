@@ -6,16 +6,14 @@ const DummyLedgerPlugin = require('.')
 
 const sender = ILP.createSender({
   _plugin: DummyLedgerPlugin,
-  prefix: 'ilpdemo.red.',
-  account: 'https://red.ilpdemo.org/ledger/accounts/alice',
-  password: 'alice'
+  prefix: 'g.testing.dummy.',
+  account: 'alice'
 })
 
 const receiver = ILP.createReceiver({
   _plugin: DummyLedgerPlugin,
-  prefix: 'ilpdemo.blue.',
-  account: 'https://blue.ilpdemo.org/ledger/accounts/bob',
-  password: 'bobbob'
+  prefix: 'g.testing.dummy.',
+  account: 'bob'
 })
 
 co(function * () {

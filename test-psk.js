@@ -6,14 +6,12 @@ const DummyLedgerPlugin = require('.')
 
 const sender = ILP.createSender({
   _plugin: DummyLedgerPlugin,
-  account: 'https://localhost/ledger/accounts/alice',
-  password: 'alice'
+  account: 'alice'
 })
 
 const receiver = ILP.createReceiver({
   _plugin: DummyLedgerPlugin,
-  account: 'https://localhost/ledger/accounts/bob',
-  password: 'bobbob',
+  account: 'bob',
   // A callback can be specified to review incoming payments.
   // This is required when using PSK.
   reviewPayment: (payment, transfer) => {
