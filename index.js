@@ -12,24 +12,22 @@ class DuplicateIdError extends Error { constructor (message) { super(message); t
 class TransferNotConditionalError extends Error { constructor (message) { super(message); this.name = 'TransferNotConditionalError' } }
 class NoSubscriptionsError extends Error { constructor (message) { super(message); this.name = 'NoSubscriptionsError' } }
 
-// used to emit event on the other end when faking sendMessage/sendTransfer
-var instances = {};
-function register(instance) {
-    instances[instance.opts.account] = instance;
-}
+// singleton data structure faking the ledger (doesn't work if sender and receiver live in different processes):
+var ledger = {
+  instances: {},
+  transfers: {},
+  fulfillments: {},
+};
+ 
 function other(instance) {
   var me = instance.opts.account;
-  for (var account in instances) {
+  for (var account in ledger.instances) {
     if (account === me) {
       continue;
     }
-    return instances[account];
+    return ledger.instances[account];
   }
 }
-
-// the ledger should allow the sender to see which fulfillment the receiver submitted
-var fulfillments = {};
-var transfers = {};
 
 module.exports = class PluginDummy extends EventEmitter2 {
   constructor(opts) {
@@ -37,7 +35,7 @@ module.exports = class PluginDummy extends EventEmitter2 {
     super();
     this.opts = opts;
     this._connected = false;
-    register(this);
+    ledger.instances[opts.account] = this;
   }
   connect(opts) {
     console.log('CALLED: connect', this.opts.account, { opts });
@@ -88,15 +86,15 @@ module.exports = class PluginDummy extends EventEmitter2 {
 
   getFulfillment(transferId) {
     console.log('CALLED: getFulfillment', this.opts.account, { transferId });
-    if (typeof fulfillments[transferId] === 'undefined') {
+    if (typeof ledger.fulfillments[transferId] === 'undefined') {
       return Promise.reject(new MissingFulfillmentError());
     }
-    return Promise.resolve(fulfillments[transferId]);
+    return Promise.resolve(ledger.fulfillments[transferId]);
   }
   
   sendTransfer(transfer) {
     console.log('CALLED: sendTransfer', this.opts.account, JSON.stringify(transfer, null, 2));
-    transfers[transfer.id] = transfer;
+    ledger.transfers[transfer.id] = transfer;
     this.emit('outgoing_prepare', transfer);
     setTimeout(() => {
       other(this).emit('incoming_prepare', transfer);
@@ -115,8 +113,8 @@ module.exports = class PluginDummy extends EventEmitter2 {
 
   fulfillCondition(transferId, fulfillment)  {
     console.log('CALLED: fulfillCondition', this.opts.account, { transferId, fulfillment });
-    var transfer = transfers[transferId];
-    fulfillments[transferId] = fulfillment;
+    var transfer = ledger.transfers[transferId];
+    ledger.fulfillments[transferId] = fulfillment;
     this.emit('incoming_fulfill', transfer, fulfillment);
     setTimeout(() => {
       other(this).emit('outgoing_fulfill', transfer, fulfillment);
