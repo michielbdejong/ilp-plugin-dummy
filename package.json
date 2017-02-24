@@ -1,0 +1,28 @@
+{
+  "name": "ilp-plugin-dummy",
+  "version": "1.0.0",
+  "description": "A minimal, fake implementation of https://github.com/interledger/rfcs/blob/master/0004-ledger-plugin-interface/0004-ledger-plugin-interface.md",
+  "main": "index.js",
+  "dependencies": {
+    "co": "^4.6.0",
+    "eventemitter2": "^3.0.1",
+    "ilp": "^8.2.2"
+  },
+  "devDependencies": {
+    "co": "^4.6.0",
+    "ilp": "^8.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michielbdejong/ilp-plugin-dummy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michielbdejong/ilp-plugin-dummy/issues"
+  },
+  "homepage": "https://github.com/michielbdejong/ilp-plugin-dummy#readme"
+}
