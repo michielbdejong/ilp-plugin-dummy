@@ -1,42 +1,39 @@
 'use strict'
 
-const co = require('co')
-const ILP = require('ilp')
-const DummyLedgerPlugin = require('.')
+const ILP = require('ilp');
+const DummyLedgerPlugin = require('.');
 
 const sender = ILP.createSender({
   _plugin: DummyLedgerPlugin,
-  prefix: 'g.testing.dummy.',
-  account: 'alice'
+  account: 'alice',
 })
 
 const receiver = ILP.createReceiver({
   _plugin: DummyLedgerPlugin,
-  prefix: 'g.testing.dummy.',
-  account: 'bob'
+  account: 'bob',
 })
 
-co(function * () {
-  yield receiver.listen()
+receiver.listen().then(() => {
   receiver.on('incoming', (transfer, fulfillment) => {
-    console.log('received transfer:', transfer)
-    console.log('fulfilled transfer hold with fulfillment:', fulfillment)
-  })
+    console.log('received transfer:', transfer);
+    console.log('fulfilled transfer hold with fulfillment:', fulfillment);
+  });
 
   const request = receiver.createRequest({
     amount: '10',
-  })
-  console.log('request:', request)
+  });
+  console.log('request:', request);
 
   // Note the user of this module must implement the method for
   // communicating payment requests from the recipient to the sender
-  const paymentParams = yield sender.quoteRequest(request)
-  console.log('paymentParams', paymentParams)
-
-  const result = yield sender.payRequest(paymentParams)
-  console.log('sender result:', result)
-  // work around bug in ilp:
+  return sender.quoteRequest(request);
+}).then(paymentParams => {
+  console.log('paymentParams', paymentParams);
+  return sender.payRequest(paymentParams);
+}).then(result => {
+  console.log('sender result:', result);
+  // work around bug https://github.com/interledgerjs/ilp/issues/76
   process.exit(0);
 }).catch((err) => {
   console.log(err)
-})
+});
