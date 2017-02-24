@@ -29,12 +29,12 @@ function other(instance) {
 
 // the ledger should allow the sender to see which fulfillment the receiver submitted
 var fulfillments = {};
+var transfers = {};
 
 module.exports = class PluginDummy extends EventEmitter2 {
   constructor(opts) {
     console.log('CALLED: constructor', opts.account, { opts });
     super();
-    console.log(JSON.stringify({ instances }, null, 2));
     this.opts = opts;
     this._connected = false;
     register(this);
@@ -96,30 +96,40 @@ module.exports = class PluginDummy extends EventEmitter2 {
   
   sendTransfer(transfer) {
     console.log('CALLED: sendTransfer', this.opts.account, JSON.stringify(transfer, null, 2));
+    transfers[transfer.id] = transfer;
     this.emit('outgoing_prepare', transfer);
-    other(this).emit('incoming_prepare', transfer);
+    setTimeout(() => {
+      other(this).emit('incoming_prepare', transfer);
+    });
     return Promise.resolve(null);
   }
 
   sendMessage(message) {
     console.log('CALLED: sendMessage', this.opts.account, JSON.stringify(message, null, 2));
     // there is no event for outgoing_message.
-    other(this).emit('incoming_message', message);
+    setTimeout(() => {
+      other(this).emit('incoming_message', message);
+    });
     return Promise.resolve(null);
   }
 
   fulfillCondition(transferId, fulfillment)  {
     console.log('CALLED: fulfillCondition', this.opts.account, { transferId, fulfillment });
+    var transfer = transfers[transferId];
     fulfillments[transferId] = fulfillment;
-    this.emit('incoming_fulfill', transferId, fulfillment);
-    other(this).emit('outgoing_fulfill', transferId, fulfillment);
+    this.emit('incoming_fulfill', transfer, fulfillment);
+    setTimeout(() => {
+      other(this).emit('outgoing_fulfill', transfer, fulfillment);
+    });
     return Promise.resolve(null);
   }
 
   rejectIncomingTransfer(transferId, rejectMessage) {
     console.log('CALLED: rejectIncomingTransfer', this.opts.account, { transferId, rejectMessage });
     this.emit('incoming_reject', transfer);
-    other(this).emit('outgoing_reject', transfer);
+    setTimeout(() => {
+      other(this).emit('outgoing_reject', transfer);
+    }, 0);
     return Promise.resolve(null);
   }
 };

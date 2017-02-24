@@ -44,6 +44,8 @@ co(function * () {
 
   const result = yield sender.payRequest(paymentParams)
   console.log('sender result:', result)
+  // work around bug in ilp:
+  process.exit(0);
 }).catch((err) => {
   console.log(err)
 })
