@@ -64,7 +64,7 @@ module.exports = class PluginDummy extends EventEmitter2 {
       scale: 9,
       currencyCode: 'USD',
       currencySymbol: '$',
-      connectors: [ 'g.testing.dummy.conn2', 'g.testing.dummy.conn3' ]
+      connectors: []
     };
   }
 
@@ -73,7 +73,7 @@ module.exports = class PluginDummy extends EventEmitter2 {
     if (!this._connected) {
       throw new Error('not connected');
     }
-    return 'g.testing.dummy.conn1';
+    return `g.testing.dummy.${this.opts.account}`;
   }
 
   getBalance() {
