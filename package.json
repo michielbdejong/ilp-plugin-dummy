@@ -5,12 +5,12 @@
   "main": "index.js",
   "dependencies": {
     "co": "^4.6.0",
-    "eventemitter2": "^3.0.1",
-    "ilp": "^8.2.2"
+    "eventemitter2": "^5.0.1",
+    "ilp": "^14.1.0"
   },
   "devDependencies": {
     "co": "^4.6.0",
-    "ilp": "^8.2.2"
+    "ilp": "^14.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
